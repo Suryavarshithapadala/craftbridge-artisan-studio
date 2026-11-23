@@ -1,4 +1,5 @@
-// Server-only helpers for Lovable AI Gateway (OpenAI Responses via AI SDK).
+// Server-only helpers. Errors carry codes (AI_*) that the browser translates.
+// for Lovable AI Gateway (OpenAI Responses via AI SDK).
 import { createOpenAI } from "@ai-sdk/openai";
 import { Output, streamText, type ModelMessage } from "ai";
 import type { z } from "zod/v4";
@@ -38,13 +39,13 @@ function statusOf(error: unknown): number | undefined {
 function friendlyError(error: unknown): AiFeatureError {
   const status = statusOf(error);
   if (status === 402)
-    return new AiFeatureError("AI credits have run out for this workspace. Please add credits to keep using AI features.", 402);
-  if (status === 429) return new AiFeatureError("The AI is busy right now. Please wait a moment and try again.", 429);
-  if (status === 403) return new AiFeatureError("AI access is not available for this request.", 403);
-  if (status === 401) return new AiFeatureError("AI is not configured correctly for this app.", 401);
-  if (status === 400) return new AiFeatureError("The AI couldn't read this request. Try a different photo or shorter text.", 400);
+    return new AiFeatureError("AI_CREDITS", 402);
+  if (status === 429) return new AiFeatureError("AI_BUSY", 429);
+  if (status === 403) return new AiFeatureError("AI_DENIED", 403);
+  if (status === 401) return new AiFeatureError("AI_CONFIG", 401);
+  if (status === 400) return new AiFeatureError("AI_BAD_INPUT", 400);
   console.error("AI gateway error", error);
-  return new AiFeatureError("The AI couldn't finish this time. Please try again.", status ?? 500);
+  return new AiFeatureError("AI_FAILED", status ?? 500);
 }
 
 export async function generateStructured<T>(opts: {
@@ -54,7 +55,7 @@ export async function generateStructured<T>(opts: {
   effort?: "low" | "medium";
 }): Promise<T> {
   const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) throw new AiFeatureError("AI is not configured for this app.", 500);
+  if (!apiKey) throw new AiFeatureError("AI_CONFIG", 500);
 
   const provider = createOpenAI({
     baseURL: GATEWAY_URL,

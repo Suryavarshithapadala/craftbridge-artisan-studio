@@ -2,13 +2,13 @@ import { supabase } from "@/integrations/supabase/client";
 
 /** Resize an image file in the browser to a JPEG data URL (keeps uploads and AI requests small). */
 export async function resizeImage(file: File, maxSize = 1280, quality = 0.85): Promise<string> {
-  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
+  if (!file.type.startsWith("image/")) throw new Error("ERR_BAD_IMAGE");
   const url = URL.createObjectURL(file);
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const i = new Image();
       i.onload = () => resolve(i);
-      i.onerror = () => reject(new Error("This image couldn't be opened. Try a JPG or PNG."));
+      i.onerror = () => reject(new Error("ERR_BAD_IMAGE"));
       i.src = url;
     });
     const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
@@ -16,7 +16,7 @@ export async function resizeImage(file: File, maxSize = 1280, quality = 0.85): P
     canvas.width = Math.round(img.width * scale);
     canvas.height = Math.round(img.height * scale);
     const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Your browser couldn't process this image.");
+    if (!ctx) throw new Error("ERR_BAD_IMAGE");
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     return canvas.toDataURL("image/jpeg", quality);
   } finally {
@@ -41,8 +41,8 @@ export async function uploadProductImage(userId: string, dataUrl: string): Promi
   const { error } = await supabase.storage
     .from("product-images")
     .upload(path, dataUrlToBlob(dataUrl), { contentType: "image/jpeg", upsert: false });
-  if (error) throw new Error(`Photo upload failed: ${error.message}`);
+  if (error) { console.error(error); throw new Error("ERR_UPLOAD"); };
   const { data, error: signError } = await supabase.storage.from("product-images").createSignedUrl(path, TEN_YEARS);
-  if (signError || !data) throw new Error("Photo uploaded but the link couldn't be created.");
+  if (signError || !data) throw new Error("ERR_UPLOAD");
   return data.signedUrl;
 }

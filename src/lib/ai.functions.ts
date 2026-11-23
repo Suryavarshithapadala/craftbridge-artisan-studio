@@ -23,8 +23,8 @@ export const analyzeProductImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { imageDataUrl: string; notes?: string; craft?: string }) => {
     if (typeof input?.imageDataUrl !== "string" || !input.imageDataUrl.startsWith("data:image/"))
-      throw new Error("Please upload a product photo first.");
-    if (input.imageDataUrl.length > 6_000_000) throw new Error("This photo is too large. Please use a smaller one.");
+      throw new Error("ERR_NO_PHOTO");
+    if (input.imageDataUrl.length > 6_000_000) throw new Error("ERR_PHOTO_TOO_LARGE");
     return {
       imageDataUrl: input.imageDataUrl,
       notes: (input.notes ?? "").slice(0, 1000),
@@ -82,7 +82,7 @@ export const generateCraftStory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: StoryInput) => {
     const s = (v: unknown, max = 600) => (typeof v === "string" ? v.slice(0, max) : "");
-    if (!s(input?.craft)) throw new Error("Tell us which craft you practise.");
+    if (!s(input?.craft)) throw new Error("ERR_NO_CRAFT");
     const tone = input.tone === "professional" || input.tone === "short" ? input.tone : "heartfelt";
     return {
       artisanName: s(input.artisanName, 120),
@@ -122,8 +122,8 @@ export const translateText = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { text: string; to: "telugu" | "english" }) => {
     const text = typeof input?.text === "string" ? input.text.trim() : "";
-    if (!text) throw new Error("Enter some text to translate.");
-    if (text.length > 4000) throw new Error("Please translate up to 4,000 characters at a time.");
+    if (!text) throw new Error("ERR_NO_TEXT");
+    if (text.length > 4000) throw new Error("ERR_TEXT_TOO_LONG");
     return { text, to: input.to === "english" ? ("english" as const) : ("telugu" as const) };
   })
   .handler(async ({ data }) => {

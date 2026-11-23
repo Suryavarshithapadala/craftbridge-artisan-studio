@@ -2,9 +2,9 @@ import { useLang } from "@/lib/language";
 import { cn } from "@/lib/utils";
 
 export function LanguageToggle({ className }: { className?: string }) {
-  const { lang, setLang } = useLang();
+  const { lang, setLang, t } = useLang();
   return (
-    <div className={cn("inline-flex rounded-full border border-border bg-card p-0.5 text-xs font-semibold", className)} role="group" aria-label="Language">
+    <div className={cn("inline-flex rounded-full border border-border bg-card p-0.5 text-xs font-semibold", className)} role="group" aria-label={t("nav.language")}>
       {(["en", "te"] as const).map((l) => (
         <button
           key={l}

@@ -2,12 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { PublicProduct } from "@/lib/catalog.functions";
-import { CATEGORY_TE } from "@/lib/constants";
-import { pick, useLang } from "@/lib/language";
+import { categoryKey, pick, useLang } from "@/lib/language";
 import { formatINR } from "@/lib/pricing";
 
 export function ProductCard({ product, index = 0 }: { product: PublicProduct; index?: number }) {
-  const { lang } = useLang();
+  const { lang, t } = useLang();
   const title = pick(lang, product.title, product.title_te);
   return (
     <Link
@@ -28,7 +27,7 @@ export function ProductCard({ product, index = 0 }: { product: PublicProduct; in
           <div className="woven-texture size-full" />
         )}
         <Badge variant="cream" className="absolute left-3 top-3">
-          {lang === "te" ? <span lang="te">{CATEGORY_TE[product.category] ?? product.category}</span> : product.category}
+          {t(categoryKey(product.category))}
         </Badge>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
