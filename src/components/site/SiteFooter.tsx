@@ -25,8 +25,7 @@ export function SiteFooter() {
           <h4 className="font-display text-base text-earth-foreground">{t("footer.artisans")}</h4>
           <ul className="mt-3 space-y-2 text-sm text-earth-foreground/75">
             <li><Link to="/auth" search={{ mode: "register" }} className="hover:text-earth-foreground">{t("footer.register")}</Link></li>
-            <li><Link to="/dashboard" className="hover:text-earth-foreground">{t("footer.studio")}</Link></li>
-            <li><Link to="/studio/pricing" className="hover:text-earth-foreground">{t("footer.pricing")}</Link></li>
+            <li><Link to="/auth" search={{ mode: "login" }} className="hover:text-earth-foreground">{t("footer.studio")}</Link></li>
           </ul>
         </div>
       </div>

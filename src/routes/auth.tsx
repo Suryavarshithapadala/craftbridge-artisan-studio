@@ -47,7 +47,7 @@ function AuthPage() {
   const [lang, setLang] = useState<"english" | "telugu">("telugu");
   const [state, setState] = useState("Telangana");
 
-  const destination = search.redirect && !search.redirect.startsWith("/auth") ? search.redirect : "/dashboard";
+  const destination = search.redirect && !search.redirect.startsWith("/auth") ? search.redirect : "/";
 
   useEffect(() => {
     if (ready && user) navigate({ to: destination, replace: true });
@@ -58,7 +58,7 @@ function AuthPage() {
     const f = new FormData(e.currentTarget);
     const email = String(f.get("email")).trim();
     const password = String(f.get("password"));
-    if (password.length < 6) return toast.error("Password must be at least 6 characters.");
+    if (password.length < 6) { toast.error("Password must be at least 6 characters."); return; }
     setBusy(true);
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -75,7 +75,7 @@ function AuthPage() {
       },
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     if (!data.session) setSentTo(email);
   }
 
@@ -88,7 +88,7 @@ function AuthPage() {
       password: String(f.get("password")),
     });
     setBusy(false);
-    if (error) return toast.error(error.message === "Email not confirmed" ? "Please confirm your email first — check your inbox." : error.message);
+    if (error) { toast.error(error.message === "Email not confirmed" ? "Please confirm your email first — check your inbox." : error.message); return; }
     toast.success("Welcome back!");
   }
 

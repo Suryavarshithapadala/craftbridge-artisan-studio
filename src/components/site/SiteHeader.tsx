@@ -21,7 +21,7 @@ export function SiteHeader() {
 
   const authCta = ready && user ? (
     <Button asChild size="sm">
-      <Link to="/dashboard">
+      <Link to="/">
         <LayoutDashboard /> {t("nav.studio")}
       </Link>
     </Button>
